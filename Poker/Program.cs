@@ -35,7 +35,9 @@ namespace Poker
         public struct coordonnees
         {
             public int x;
+            
             public int y;
+
         }
 
         // Une carte
@@ -64,11 +66,16 @@ namespace Poker
         // FONCTIONS
         //----------
 
+
         // Génère aléatoirement une carte : {valeur;famille}
         // Retourne une expression de type "structure carte"
         public static carte tirage()
         {
-            
+            Random r = new Random();
+            carte uneCarte = default(carte);
+            uneCarte.valeur = valeurs[r.Next(0, 13)];
+            uneCarte.famille = familles[r.Next(0, 4)];
+            return uneCarte;
         }
 
         // Indique si une carte est déjà présente dans le jeu
@@ -76,7 +83,31 @@ namespace Poker
         // Retourne un entier (booléen)
         public static bool carteUnique(carte uneCarte, carte[] unJeu, int numero)
         {
-
+            int i = 0;
+            bool unique = true;
+            checked
+            {
+                do
+                {
+                    if (i != numero)
+                    {
+                        if (uneCarte.valeur == unJeu[i].valeur && uneCarte.famille == unJeu[i].famille)
+                        {
+                            unique = false;
+                        }
+                        else
+                        {
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+                while (unique && i < 5);
+                return unique;
+            }
         }
 
         // Calcule et retourne la COMBINAISON (paire, double-paire... , quinte-flush)
@@ -84,9 +115,50 @@ namespace Poker
         // La valeur retournée est un élement de l'énumération 'combinaison' (=constante)
         public static combinaison chercheCombinaison(carte[] unJeu)
         {
-
-        }
-
+            int nbpaires = 0;
+            int[] array = new int[5];
+            int[] similaire = array;
+            bool paire = false;
+            bool brelan = false;
+            char[,] quintes = new char[4, 5]
+            {
+            { 'X', 'V', 'D', 'R', 'A' },
+            { '9', 'X', 'V', 'D', 'R' },
+            { '8', '9', 'X', 'V', 'D' },
+            { '7', '8', '9', 'X', 'V' }
+            };
+            combinaison resultat = combinaison.RIEN;
+            checked
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    for (int j = 0; j < 5; j++)
+                    {
+                        if (unJeu[i].valeur == unJeu[j].valeur)
+                        {
+                            similaire[i]++;
+                        }
+                    }
+                }
+                for (int i = 0; i < 5; i++)
+                {
+                    if (similaire[i] == 4)
+                    {
+                        return combinaison.CARRE;
+                    }
+                    if (similaire[i] == 3)
+                    {
+                        resultat = combinaison.BRELAN;
+                        brelan = true;
+                    }
+                    else if (similaire[i] == 2)
+                    {
+                        resultat = combinaison.PAIRE;
+                        paire = true;
+                        nbpaires++;
+                    }
+                }
+                //Pas finis, pas eu le temps
         // Echange des cartes
         // Paramètres : le tableau de 5 cartes et le tableau des numéros des cartes à échanger
         private static void echangeCarte(carte[] unJeu, int[] e)
@@ -114,6 +186,7 @@ namespace Poker
         {
 
         }
+
 
         // Affiche à l'écran une carte {valeur;famille} 
         private static void affichageCarte(carte uneCarte)
@@ -161,6 +234,7 @@ namespace Poker
                 left = left + 15;
                 c++;
             }
+
 
         }
 
